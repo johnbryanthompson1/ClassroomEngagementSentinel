@@ -1,0 +1,31 @@
+## 1) Problem Statement
+### Context & Rationale
+Teachers mix instructional modes—lecture, small-group projects, whole-class discussion, and stations—to reach learning goals. What’s missing is **quantitative evidence** about which modes generate the highest student engagement in a given context. This project builds a **privacy-first, edge-capable** system that estimates engagement signals per minute and aggregates them by activity type so educators can make data-informed design choices.
+### Objective
+Build an audio-first (with optional computer-vision add-on) pipeline that produces per-minute engagement metrics and an **Engagement Index (0–100)** and then compares these metrics across **Lecture**, **Group Projects**, **Whole-class Discussions**, and **Stations/Rotations**.
+### Engagement Signals (Non-identifying)
+- **Audio**: student vs. teacher talk ratio; number of distinct speakers; turn-taking entropy; silence percentage.
+- **Optional Vision (no face ID, low-resolution)**: head/pose orientation (toward teacher vs. peers), raised-hand events, movement level.
+- **Derived**: late-fusion Engagement Index (0–100) from normalized audio/vision features.
+### Inputs & Outputs
+- **Inputs**: multi-microphone audio (2–4 USB mics or a small mic array); optional camera; teacher toggle for activity type.
+- **Outputs**:
+  - Per-minute metrics (CSV/JSONL): `student_talk_ratio`, `distinct_voices`, `turn_entropy`, `silence_pct`, optional CV features.
+  - **Engagement Index** (0–100) per minute and aggregated per activity type.
+  - Dashboard visualizations and weekly exports for comparison across modes.
+### Success Metrics
+- **VAD accuracy**: F1 ≥ **0.90** on labeled clips.
+- **Distinct-voices proxy**: MAE ≤ **1.0** vs. hand-coded baseline.
+- **Validity** vs. human observation rubric: Spearman ρ ≥ **0.60**.
+- **Segment mapping**: ≥ **95%** of minutes correctly labeled with the intended activity type.
+- **Latency**: near–real time (≤ 1 s per window) or offline batch acceptable.
+### Constraints & Ethics
+- **Privacy-first**: no identity recognition; default behavior stores **features only**, not raw A/V. Debug retention is opt-in and time-limited.
+- **Edge-first**: runs on Raspberry Pi or mini-PC; no cloud dependency required.
+- **Transparency**: in-app notice of what is captured; clear purpose and retention settings.
+- **Classroom-friendly**: minimal wiring; small form factor; single-command startup.
+### Initial Approach (MVP)
+1. **Audio ingest** with VAD (WebRTC/pyannote/silero) → per-minute student vs. teacher talk ratio.
+2. **Turn-taking metrics**: distinct voices proxy, entropy, silence %.
+3. **Dashboard**: activity toggle; timeline charts; weekly CSV export.
+4. **Validation**: short human-coded samples to check correlation with Engagement Index.
